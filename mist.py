@@ -20,7 +20,7 @@ def fetchInfluxClient() -> InfluxDBClient:
  
 def writeToInflux(c: InfluxDBClient, d: dict) -> bool:
     iso = time.ctime()
-    # Cant remember what session is...
+    # Session
     session = "env"
     json_body = [
         {"measurement": session, "tags": {"run": 1,}, "time": iso, "fields": d}
@@ -29,7 +29,7 @@ def writeToInflux(c: InfluxDBClient, d: dict) -> bool:
         ret = c.write_points(json_body, database='mistwireless')
         return True
     except Exception as e:
-        print(f"Shits fucky: {e}")
+        print(f"Something went wrong: {e}")
         return False
  
  
