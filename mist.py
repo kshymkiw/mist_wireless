@@ -4,6 +4,7 @@ import time
 import os
 import string
 import schedule
+from influxdb import InfluxDBClient
 
 ### Set Variables
 OrgID = '<Your OrgID from Mist Dashboard>'
@@ -34,12 +35,21 @@ def fetch_mist():
 	Number_of_Devices_Connected = parsed["num_devices_connected"]
 	Number_of_Devices_Disconnected = parsed["num_devices_disconnected"]
 ### Print the Output of each
-	print("Number of Sites:" + str(Number_of_Sites))
-	print("Number of Devices in Inventory:" + str(Number_of_Devices_in_Inventory))
-	print("Number of Devices Connected:" + str(Number_of_Devices_Connected))
-	print("Number of Devices Disconnected:" +str(Number_of_Devices_Disconnected))
+	#print("Number of Sites:" + str(Number_of_Sites))
+	#print("Number of Devices in Inventory:" + str(Number_of_Devices_in_Inventory))
+	#print("Number of Devices Connected:" + str(Number_of_Devices_Connected))
+	#print("Number of Devices Disconnected:" +str(Number_of_Devices_Disconnected))
 ### Schedule fetch_mist
 schedule.every(10).seconds.do(fetch_mist)
 while True:
 	schedule.run_pending()
 	time.sleep(1)
+### Start Putting the Data into InfluxDB
+### Define your InfluxDB Server
+client = InfluxDBClient(host='localhost', port=8086)
+### If you want Authentication or SSL Support comment out above line, and uncomment below line
+#client = InfluxDBClient(host='localhost', port=8086, username='myuser', password='mypass', ssl=True, verify_ssl=True)
+### Create a new Database if you need to
+client.create_database('mistwireless')
+### Make sure we are using the proper Database
+client.switch_database('mistwireless')
