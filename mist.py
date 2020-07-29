@@ -5,51 +5,86 @@ import os
 import string
 import schedule
 from influxdb import InfluxDBClient
-
-### Set Variables
-OrgID = '<Your OrgID from Mist Dashboard>'
-AuthToken = '<Your AuthToken from Mist API>'
-url = "https://api.mist.com/api/v1/orgs/%s/stats" % (OrgID)
-
-payload = {}
-headers = {
-  'Authorization': 'Token {}'.format(AuthToken),
-  'Content-Type': 'application/json'
-}
-### Define Function to get Mist API Information
-def fetch_mist():
-	print("Gathering Stats from Mist")
-	response = requests.request("GET", url, headers=headers, data = payload)
-### Print the Output to make sure the GET succeeded
-	print(response.ok)
-	print(response.status_code)
-### Read the output from Mist
-	data = response.text
-### Parse this into JSON
-	parsed = json.loads(data)
-### Print the Output
-# print(json.dumps(parsed, indent=4))
-### Extract the Data
-	Number_of_Sites = parsed["num_sites"]
-	Number_of_Devices_in_Inventory = parsed["num_inventory"]
-	Number_of_Devices_Connected = parsed["num_devices_connected"]
-	Number_of_Devices_Disconnected = parsed["num_devices_disconnected"]
-### Print the Output of each
-	#print("Number of Sites:" + str(Number_of_Sites))
-	#print("Number of Devices in Inventory:" + str(Number_of_Devices_in_Inventory))
-	#print("Number of Devices Connected:" + str(Number_of_Devices_Connected))
-	#print("Number of Devices Disconnected:" +str(Number_of_Devices_Disconnected))
-### Schedule fetch_mist
-schedule.every(10).seconds.do(fetch_mist)
-while True:
-	schedule.run_pending()
-	time.sleep(1)
-### Start Putting the Data into InfluxDB
-### Define your InfluxDB Server
-client = InfluxDBClient(host='localhost', port=8086)
-### If you want Authentication or SSL Support comment out above line, and uncomment below line
-#client = InfluxDBClient(host='localhost', port=8086, username='myuser', password='mypass', ssl=True, verify_ssl=True)
-### Create a new Database if you need to
-client.create_database('mistwireless')
-### Make sure we are using the proper Database
-client.switch_database('mistwireless')
+ 
+ 
+def fetchInfluxClient() -> InfluxDBClient:
+    # The database we created
+    dbname = "mistwireless"
+    hostname = "localhost"
+    port = 8086
+    #user = "username"
+    #password = "password"
+    client = InfluxDBClient(hostname, port, dbname)
+    return client
+ 
+ 
+def writeToInflux(c: InfluxDBClient, d: dict) -> bool:
+    iso = time.ctime()
+    # Cant remember what session is...
+    session = "env"
+    json_body = [
+        {"measurement": session, "tags": {"run": 1,}, "time": iso, "fields": d}
+    ]
+    try:
+        ret = c.write_points(json_body, database='mistwireless')
+        return True
+    except Exception as e:
+        print(f"Shits fucky: {e}")
+        return False
+ 
+ 
+def fetch_mist(org: str, headers: dict, payload: dict) -> dict:
+    """Function to snag data from mist
+    Returns:
+        r.json: a dict containing the results from Mist API
+    """
+    mist_url = f"https://api.mist.com/api/v1/orgs/{org}/stats"
+    r = requests.get(mist_url, headers=headers, json=payload)
+    if r.status_code != requests.status_codes.codes.ALL_OK:
+        print("Got unexpected status code, exiting")
+        print("%s - %s" % (r.status, r.text))
+        exit(1)
+    try:
+        return r.json()
+    except Exception as e:
+        print(f"Got unexpected data from mist API{e}. Exiting. Data:\n{r.text}")
+        exit(1)
+ 
+ 
+def main():
+    ### Set Variables
+    OrgID = "<Your OrgID>"
+    AuthToken = "<Your AuthToken>"
+    # Get influx client
+    iclient = fetchInfluxClient()
+ 
+    payload = {}
+    headers = {
+        "Authorization": "Token {}".format(AuthToken),
+        "Content-Type": "application/json",
+    }
+    mist_data = fetch_mist(OrgID, headers, payload)
+    data = dict()
+    data["num_sites"] = mist_data["num_sites"]
+    data["num_inventory"] = mist_data["num_inventory"]
+    data["num_devices_connected"] = mist_data["num_devices_connected"]
+    data["num_devices_disconnected"] = mist_data["num_devices_disconnected"]
+ 
+    while True:
+        mist_data = fetch_mist(OrgID, headers, payload)
+        data = dict()
+        data["num_sites"] = mist_data["num_sites"]
+        data["num_inventory"] = mist_data["num_inventory"]
+        data["num_devices_connected"] = mist_data["num_devices_connected"]
+        data["num_devices_disconnected"] = mist_data["num_devices_disconnected"]
+ 
+        if writeToInflux(iclient, data):
+            print("Wrote {data} to influx. Sleeping")
+        else:
+            print("Wrote {data} to influx. Sleeping")
+        time.sleep(10)
+ 
+ 
+if __name__ == "__main__":
+    main()
+ 
