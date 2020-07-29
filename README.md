@@ -24,6 +24,20 @@ You would then see the following output letting you know it is working:
     
 The script will self run every 10 seconds.  If you want to change this, just change the scheduler.
 
+### InfluxDB Data
+
+The data will be stored in <database>, env, $variables:
+    
+    > select * from env
+    name: env
+    time                 num_devices_connected num_devices_disconnected num_inventory num_sites run
+    ----                 --------------------- ------------------------ ------------- --------- ---
+    2020-07-29T10:46:53Z 1                     1                        2             1         1
+    2020-07-29T10:47:03Z 1                     1                        2             1         1
+    2020-07-29T10:47:13Z 1                     1                        2             1         1
+    2020-07-29T10:47:24Z 1                     1                        2             1         1
+
+
 
 ### Special Thanks 
 
