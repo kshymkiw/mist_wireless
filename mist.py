@@ -42,7 +42,7 @@ def fetch_mist(org: str, headers: dict, payload: dict) -> dict:
     r = requests.get(mist_url, headers=headers, json=payload)
     if r.status_code != requests.status_codes.codes.ALL_OK:
         print("Got unexpected status code, exiting")
-        print("%s - %s" % (r.status, r.text))
+        print("%s - %s" % (r.status_code, r.text))
         exit(1)
     try:
         return r.json()
