@@ -65,12 +65,12 @@ def main():
     }
     mist_data = fetch_mist(OrgID, headers, payload)
     data = dict()
-    data["total"] = mist_data["total_clients"]
+    data["total"] = mist_data["total"]
  
     while True:
         mist_data = fetch_mist(OrgID, headers, payload)
         data = dict()
-        data["num_sites"] = mist_data["total_clients"]
+        data["total"] = mist_data["total"]
  
         if writeToInflux(iclient, data):
             print("Wrote {data} to influx. Sleeping")
