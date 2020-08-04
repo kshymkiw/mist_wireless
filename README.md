@@ -7,7 +7,7 @@ You will need the following from your Mist Account
 1. Org ID - This is accessible from https://manage.mist.com Then click on Organization and Settings.  You can copy your Org ID directly from here.
 2. Your API Token - If you haven't created one, make sure you're logged into your Mist Dashboard, and go to https://api.mist.com/api/v1/self/apitokens and hit POST
 
-Drop your OrgID and Token in lines 56 and 57
+Drop your OrgID and Token in lines 72 and 73
 
 This script assumes you have already created an InfluxDB with the name mistwireless.  If you want to change any of the DB parameters you will need to edit lines 12-17 and 29.
 
