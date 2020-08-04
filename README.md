@@ -30,12 +30,13 @@ The data will be stored in <database>, env, $variables:
     
     > select * from env
     name: env
-    time                 num_devices_connected num_devices_disconnected num_inventory num_sites run
-    ----                 --------------------- ------------------------ ------------- --------- ---
-    2020-07-29T10:46:53Z 1                     1                        2             1         1
-    2020-07-29T10:47:03Z 1                     1                        2             1         1
-    2020-07-29T10:47:13Z 1                     1                        2             1         1
-    2020-07-29T10:47:24Z 1                     1                        2             1         1
+    time                 num_devices_connected num_devices_disconnected num_inventory num_sites run total
+    ----                 --------------------- ------------------------ ------------- --------- --- -----
+    2020-08-04T17:20:45Z 1                     1                        2             1         1   5
+    2020-08-04T17:20:56Z 1                     1                        2             1         1   5
+    2020-08-04T17:21:07Z 1                     1                        2             1         1   5
+    2020-08-04T17:21:18Z 1                     1                        2             1         1   5
+
 
 
 
