@@ -42,4 +42,4 @@ The data will be stored in <database>, env, $variables:
 
 ### Special Thanks 
 
-Special thanks to OMGKitteh who massively helped me on this.
+Special thanks to OMGKitteh (https://github.com/rucarrol) who massively helped me on this.
