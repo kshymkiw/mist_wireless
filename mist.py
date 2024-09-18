@@ -99,9 +99,9 @@ def main():
         data["total"] = client_data["total"]
  
         if writeToInflux(iclient, data):
-            print("Wrote {data} to influx. Sleeping")
+            print(f"Wrote {data} to influx. Sleeping")
         else:
-            print("Wrote {data} to influx. Sleeping")
+            print(f"Wrote {data} to influx. Sleeping")
         time.sleep(10)
  
  
